@@ -1,0 +1,64 @@
+/*
+ *	Parking Assistant
+ *	STEP 1: Utrasonic Distance Sensor
+ *	by James Davies-Fox
+ * 
+ * 	April 21, 2020
+*/
+
+// 	Assign appropriate names for the pins that we're using. Why?
+// 	1)	Makes our code easier to read. 
+// 	2) 	Easier to change if we use different values.
+#define trigPin 10
+#define echoPin 12
+#define minDistance 60
+
+//	Define a couple of floats (variables with a decimal point).
+// 	1)	Duration is needed to measure the amount of time 
+//		the ultrasonic wave takes to bounce back to the sensor.
+// 	2) 	Distance is calculated by plugging duration into a
+//		formula.
+float duration;
+float distance;
+
+//	Setup function.
+void setup() {
+  // Setup Serial Monitor used to display distance.
+  Serial.begin(9600);
+  // Setup Inputs and Outputs Ultrasonic Sensor.
+  pinMode(trigPin, OUTPUT);	// Trigger sends pulse outward.
+  pinMode(echoPin, INPUT);	// Echo reads pulse coming back.
+}
+
+//	Main loop function (where the magic happens).
+void loop() {
+  // Send a 10-microsecond pulse to the trigger.
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(1);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10); // Duration of HIGH (must be 10).
+  digitalWrite(trigPin, LOW); 
+  
+  // Measuring how long the pulse stays HIGH.
+  duration = pulseIn(echoPin, HIGH); 
+  
+  // Calculate the distance. Note:
+  // 1) Distance = Speed * Time
+  // 2) Speed = 0.0343 (sound travels 343m per second)
+  // 3) The wave travels out and bounces back,
+  // 	so we need to divide the answer by 2.
+  distance = (.0343*duration)/2;
+  
+  // If-else statement to:
+  // 1)	Print warning message OR distance in monitor.
+  // 2) Turn on/off warning LED
+  // 3) Turn on/off warning buzzer.
+  Serial.print("Distance = ");
+  if(distance <= minDistance) {
+    Serial.println("STOP! TOO CLOSE."); // Print warning message.
+  } else {
+    Serial.print(distance); // Print distance.
+    Serial.println(" cm");
+  }
+  delay(500);
+}
